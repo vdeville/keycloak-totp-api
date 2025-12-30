@@ -158,6 +158,9 @@ class TOTPResourceApi(
             return badRequest("Invalid secret")
         }
 
+        // IMPORTANT: createFromPolicy expects the RAW secret (not the Base32 one from the QR)
+        val rawSecret = String(secretBytes, Charsets.UTF_8)
+
         // Check existing credential
         val existingCredential = user.credentialManager().getStoredCredentialByNameAndType(
             request.deviceName,
@@ -192,11 +195,11 @@ class TOTPResourceApi(
             user.credentialManager().removeStoredCredentialById(existingCredential.id)
         }
 
-        val totpCredentialModel = OTPCredentialModel.createFromPolicy(realm, encodedSecret, request.deviceName)
+        val totpCredentialModel = OTPCredentialModel.createFromPolicy(realm, rawSecret, request.deviceName)
 
         val ok = CredentialHelper.createOTPCredential(session, realm, user, request.initialCode, totpCredentialModel)
 
-        // sometime Keycloak return false event if credential is created. To handle this, double check if credential was created and return success if yes
+        // sometime Keycloak return false even if credential is created. To handle this, double check if credential was created and return success if yes
         if (!ok) {
             val existsNow = user.credentialManager().getStoredCredentialByNameAndType(
                 request.deviceName,
