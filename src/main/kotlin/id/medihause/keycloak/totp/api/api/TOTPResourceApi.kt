@@ -192,10 +192,24 @@ class TOTPResourceApi(
             user.credentialManager().removeStoredCredentialById(existingCredential.id)
         }
 
-        // Store credential using Base32 secret string (encodedSecret)
         val totpCredentialModel = OTPCredentialModel.createFromPolicy(realm, encodedSecret, request.deviceName)
 
-        if (!CredentialHelper.createOTPCredential(session, realm, user, request.initialCode, totpCredentialModel)) {
+        val ok = CredentialHelper.createOTPCredential(session, realm, user, request.initialCode, totpCredentialModel)
+
+        // sometime Keycloak return false event if credential is created. To handle this, double check if credential was created and return success if yes
+        if (!ok) {
+            val existsNow = user.credentialManager().getStoredCredentialByNameAndType(
+                request.deviceName,
+                OTPCredentialModel.TYPE
+            ) != null
+
+            if (existsNow) {
+                //createOTPCredential returned false but credential exists; returning 201 anyway
+                return Response.status(Response.Status.CREATED)
+                    .entity(CommonApiResponse("TOTP credential registered"))
+                    .build()
+            }
+
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                 .entity(CommonApiResponse("Failed to create TOTP credential"))
                 .build()
