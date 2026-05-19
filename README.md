@@ -12,16 +12,13 @@ This Keycloak extension enables generating, registering, and verifying TOTP (Tim
 
 ## Compatibility
 
-| Keycloak runtime | Status     | How to build                                                            |
-|------------------|------------|-------------------------------------------------------------------------|
-| 26.x (26.0–26.6) | Supported  | Default — `./gradlew shadowJar` (SPI pinned to 26.0.6, ABI-compatible)  |
-| 25.x             | Unverified | `./gradlew shadowJar -PkeycloakVersion=25.0.6` (may need source tweaks) |
-| ≤ 24.x           | Unsupported| Jakarta/SPI breaking changes, not retargeted                            |
-| 27.x+            | Unverified | Re-validate SPI usages before bumping                                   |
+**Supported: Keycloak 26.x only** (built and tested against `26.0.6` SPI, ABI-compatible across 26.0 → 26.6).
+
+Older majors (≤ 25) are no longer supported — Jakarta / SPI changes between majors are intrusive enough that we don't maintain compatibility shims. If you need an older target, fork from a previous tag.
 
 Requires **JDK 21+** at runtime, Gradle **9.1+** to build.
 
-The targeted Keycloak SPI version lives in [`gradle.properties`](./gradle.properties) (`keycloakVersion`). Override per-build with `-PkeycloakVersion=X.Y.Z` — the `version` of the produced jar tracks the major (`1.2.0-kcXX`).
+The targeted Keycloak SPI version lives in [`gradle.properties`](./gradle.properties) (`keycloakVersion`). It can be bumped to any 26.x patch with `./gradlew shadowJar -PkeycloakVersion=26.Y.Z`; the produced jar version stays `1.2.0-kc26`.
 
 ## Building the Project
 
@@ -29,7 +26,7 @@ This project uses Gradle for building. To build the project, follow these steps:
 
 1. Clone this repository:
    ```
-   git clone https://github.com/medihause/keycloak-totp-api.git
+   git clone https://github.com/vdeville/keycloak-totp-api.git
    cd keycloak-totp-api
    ```
 2. Build the project using the `shadowJar` task:
@@ -43,7 +40,7 @@ This will create a JAR file in the `build/libs` directory.
 
 ### Downloading the Extension
 
-1. Go to the [Releases](https://github.com/medihause/keycloak-totp-api/releases) page of this repository.
+1. Go to the [Releases](https://github.com/vdeville/keycloak-totp-api/releases) page of this repository.
 2. Download the latest release, making sure to choose the JAR file with the 'all' suffix (e.g., `keycloak-totp-api-1.0.0-all.jar`), as it includes all necessary dependencies.
 
 ### Installing the Extension
