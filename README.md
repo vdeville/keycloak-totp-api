@@ -79,6 +79,22 @@ When using Docker, you need to make the extension available to the Keycloak cont
 
 After adding the extension, make sure to build the Keycloak image if you're using a custom Dockerfile.
 
+### Expected boot warning
+
+On startup Keycloak logs:
+
+```
+WARN  [org.key.services] (build-7) KC-SERVICES0047: totp-api
+(id.medihause.keycloak.totp.api.TOTPApiRealmResourceProviderFactory) is
+implementing the internal SPI realm-restapi-extension. This SPI is internal
+and may change without notice
+```
+
+This is emitted for **every** custom `RealmResourceProviderFactory` — it is
+the only public way to expose custom REST endpoints on a realm in Keycloak.
+The SPI has been stable across the entire 26.x line; the warning is purely
+informational and can be ignored.
+
 ## Local development
 
 A `compose.yaml` is provided to run Keycloak with the freshly built `.jar` mounted as a provider, a seeded realm, and a JVM debug socket exposed.
@@ -127,9 +143,12 @@ A [Bruno](https://www.usebruno.com/) collection lives under `dev/bruno/`. Open B
 Recommended run order:
 
 1. **01 - Get service account token** — performs `client_credentials` against `totp-test`, stashes `access_token` in the env.
-2. **02 - Generate TOTP** — calls `/generate`, stashes `encoded_secret`. Scan the returned QR code (it is base64-encoded in `qrCode`) or feed `encoded_secret` to `oathtool --totp -b "$encoded_secret"` to obtain a current code.
+2. **02 - Generate TOTP** — calls `/generate`, stashes `encoded_secret`. To turn that into a current 6-digit code you have three options:
+   - scan the returned QR code (base64 in `qrCode`) with any Authenticator app,
+   - paste `encoded_secret` into <https://totp.danhersam.com/> (handy for quick manual tests — no app install needed),
+   - or run `oathtool --totp -b "$encoded_secret"` locally.
 3. **03 - Register TOTP** — replace `initialCode` with the code from step 2 and run within 5 minutes (TTL of the pending secret).
-4. **04 - Verify TOTP** — replace `code` with a fresh code from the same authenticator.
+4. **04 - Verify TOTP** — replace `code` with a fresh code from the same source (app, <https://totp.danhersam.com/>, or `oathtool`).
 
 ## API Endpoints
 
