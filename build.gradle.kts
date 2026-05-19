@@ -51,8 +51,9 @@ tasks {
         dependencies {
             include(dependency("org.jetbrains.kotlin:kotlin-stdlib.*"))
         }
-        // Nom fixe attendu par la CI (.github/workflows/build-release.yml)
-        archiveFileName.set("keycloak-totp-api.jar")
+        // Sortie versionnée : build/libs/keycloak-totp-api-<version>.jar
+        archiveBaseName.set("keycloak-totp-api")
+        archiveClassifier.set("")
     }
 
     shadowJar { dependsOn("classes") }

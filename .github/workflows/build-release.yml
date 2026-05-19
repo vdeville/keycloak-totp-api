@@ -37,6 +37,6 @@ jobs:
           target_commitish: ${{ github.sha }}
           generate_release_notes: true
           draft: false
-          files: build/libs/keycloak-totp-api.jar
+          files: build/libs/keycloak-totp-api-*.jar
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

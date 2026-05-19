@@ -99,10 +99,12 @@ A `compose.yaml` is provided to run Keycloak with the freshly built `.jar` mount
 ### 1. Build the extension
 
 ```bash
-./gradlew shadowJar
+./gradlew clean shadowJar
 ```
 
-The compose file mounts `build/libs/keycloak-totp-api.jar` into the container. Rebuild + `docker compose restart keycloak` reloads the extension.
+The compose file mounts the **whole `build/libs/` directory** into `/opt/keycloak/providers/` (read-only). Keycloak loads every `*.jar` it finds there, so always prefix with `clean` to avoid leaving stale versions alongside the fresh one. After rebuilding, `docker compose restart keycloak` reloads the extension.
+
+The output filename embeds the version: `build/libs/keycloak-totp-api-<version>.jar` (e.g. `keycloak-totp-api-1.2.0-kc26.jar`). That is the file attached to GitHub releases by the CI.
 
 ### 2. Start Keycloak
 

@@ -28,8 +28,10 @@ services:
             # suspend=n -> Keycloak ne bloque pas au boot, l'attache est facultative.
             JAVA_OPTS_APPEND: "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:8787"
         volumes:
-            # Le .jar généré par `./gradlew shadowJar` est mounté comme provider.
-            - ./build/libs/keycloak-totp-api.jar:/opt/keycloak/providers/keycloak-totp-api.jar:ro
+            # Mount du dossier build/libs en lecture seule : Keycloak charge tous
+            # les .jar qu'il y trouve. Pense à `./gradlew clean shadowJar` avant
+            # `docker compose up` pour ne pas embarquer d'anciennes versions.
+            - ./build/libs:/opt/keycloak/providers:ro
             # Realm de test seedé au démarrage (--import-realm).
             - ./dev/realm:/opt/keycloak/data/import:ro
         ports:
