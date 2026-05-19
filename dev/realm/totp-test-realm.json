@@ -77,7 +77,10 @@
       "username": "service-account-totp-api-admin",
       "enabled": true,
       "serviceAccountClientId": "totp-api-admin",
-      "realmRoles": ["default-roles-totp-test", "manage-totp"]
+      "realmRoles": ["default-roles-totp-test", "manage-totp"],
+      "clientRoles": {
+        "realm-management": ["manage-users", "view-users"]
+      }
     }
   ]
 }

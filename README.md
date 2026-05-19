@@ -149,6 +149,8 @@ Recommended run order:
    - or run `oathtool --totp -b "$encoded_secret"` locally.
 3. **03 - Register TOTP** — replace `initialCode` with the code from step 2 and run within 5 minutes (TTL of the pending secret).
 4. **04 - Verify TOTP** — replace `code` with a fresh code from the same source (app, <https://totp.danhersam.com/>, or `oathtool`).
+5. **05 - List user credentials** — hits Keycloak's Admin REST API (`/admin/realms/.../users/{id}/credentials`), stashes the OTP credential id into `otp_credential_id`.
+6. **06 - Delete TOTP credential** — `DELETE` on the same endpoint using the stashed id. Requires `realm-management/manage-users`, already granted to `totp-api-admin` in the seeded realm.
 
 ## API Endpoints
 
@@ -219,6 +221,17 @@ Verifies a TOTP code for a user. The endpoint is wired to Keycloak's `BruteForce
   - `401` invalid TOTP code
   - `404` no matching credential
   - `429` user temporarily locked by brute-force protection
+
+### Deleting a TOTP credential
+
+This extension does **not** expose a delete endpoint on purpose — Keycloak already ships one in the Admin REST API:
+
+```http
+GET    {{BASE_URL}}/admin/realms/{{REALM}}/users/{{USER_ID}}/credentials
+DELETE {{BASE_URL}}/admin/realms/{{REALM}}/users/{{USER_ID}}/credentials/{{CREDENTIAL_ID}}
+```
+
+Use the first call to list credentials and pick the `id` of the OTP entry (filter on `type == "otp"`), then `DELETE` it. The caller needs the `manage-users` client role on the `realm-management` client (not `manage-totp`, which only governs this extension). In the seeded `totp-test` realm, `totp-api-admin` already gets `realm-management/manage-users` and `view-users` so requests 05/06 in the Bruno collection work out of the box — when wiring this against a real environment, grant those client roles explicitly to whichever service account needs to delete credentials.
 
 ## Authentication
 
