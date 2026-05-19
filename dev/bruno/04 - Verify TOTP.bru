@@ -1,0 +1,37 @@
+meta {
+  name: 04 - Verify TOTP
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{base_url}}/realms/{{realm}}/totp-api/{{user_id}}/verify
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+headers {
+  Content-Type: application/json
+  Accept: application/json
+}
+
+body:json {
+  {
+    "deviceName": "{{device_name}}",
+    "code": "REPLACE_WITH_CURRENT_TOTP"
+  }
+}
+
+docs {
+  Lance la même app Authenticator que `03 - Register TOTP` pour obtenir le code courant.
+}
+
+tests {
+  test("status 200", function() {
+    expect(res.status).to.equal(200);
+  });
+}

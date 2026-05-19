@@ -1,0 +1,43 @@
+meta {
+  name: 03 - Register TOTP
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{base_url}}/realms/{{realm}}/totp-api/{{user_id}}/register
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+headers {
+  Content-Type: application/json
+  Accept: application/json
+}
+
+body:json {
+  {
+    "deviceName": "{{device_name}}",
+    "encodedSecret": "{{encoded_secret}}",
+    "initialCode": "REPLACE_WITH_TOTP_FROM_AUTHENTICATOR",
+    "overwrite": true
+  }
+}
+
+docs {
+  Pour générer `initialCode` :
+  - flashez le QR code retourné par `02 - Generate TOTP` dans une app Authenticator
+  - OU calculez le TOTP localement à partir de `encoded_secret` (Base32) avec un outil type `oathtool` :
+      oathtool --totp -b "$ENCODED_SECRET"
+  Le secret n'est valide que 5 minutes après l'appel à `/generate`.
+}
+
+tests {
+  test("status 201", function() {
+    expect(res.status).to.equal(201);
+  });
+}

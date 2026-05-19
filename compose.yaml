@@ -1,0 +1,38 @@
+# Stack de dev locale pour tester l'extension keycloak-totp-api.
+#
+# Usage :
+#   ./gradlew shadowJar
+#   docker compose up
+#
+# Une fois lancé :
+#   - Console admin Keycloak : http://localhost:8080  (admin / admin)
+#   - Realm de test          : "totp-test" (importé au démarrage)
+#   - Debug JVM (JDWP)       : localhost:8787 (suspend=n)
+#
+# Le .jar produit par `./gradlew shadowJar` est monté en lecture seule
+# dans /opt/keycloak/providers. Pour recharger l'extension après un rebuild,
+# redémarrer le service :
+#   docker compose restart keycloak
+
+services:
+    keycloak:
+        image: quay.io/keycloak/keycloak:26.0.6
+        container_name: keycloak-totp-api
+        environment:
+            KC_BOOTSTRAP_ADMIN_USERNAME: admin
+            KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+            KC_HEALTH_ENABLED: "true"
+            KC_LOG_LEVEL: INFO
+            KC_HOSTNAME_STRICT: "false"
+            # Active le serveur JDWP pour attacher un debugger depuis l'IDE.
+            # suspend=n -> Keycloak ne bloque pas au boot, l'attache est facultative.
+            JAVA_OPTS_APPEND: "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:8787"
+        volumes:
+            # Le .jar généré par `./gradlew shadowJar` est mounté comme provider.
+            - ./build/libs/keycloak-totp-api.jar:/opt/keycloak/providers/keycloak-totp-api.jar:ro
+            # Realm de test seedé au démarrage (--import-realm).
+            - ./dev/realm:/opt/keycloak/data/import:ro
+        ports:
+            - "8080:8080"
+            - "8787:8787"
+        command: ["start-dev", "--import-realm"]

@@ -1,0 +1,83 @@
+{
+  "realm": "totp-test",
+  "enabled": true,
+  "displayName": "TOTP API Test Realm",
+  "registrationAllowed": false,
+  "resetPasswordAllowed": true,
+  "loginWithEmailAllowed": true,
+  "duplicateEmailsAllowed": false,
+  "sslRequired": "none",
+  "accessTokenLifespan": 1800,
+  "otpPolicyType": "totp",
+  "otpPolicyAlgorithm": "HmacSHA1",
+  "otpPolicyDigits": 6,
+  "otpPolicyPeriod": 30,
+  "otpPolicyLookAheadWindow": 1,
+  "roles": {
+    "realm": [
+      {
+        "name": "manage-totp",
+        "description": "Allows calling the keycloak-totp-api endpoints"
+      }
+    ]
+  },
+  "clients": [
+    {
+      "clientId": "totp-api-admin",
+      "name": "TOTP API admin (service account)",
+      "description": "Client confidentiel utilisé par les scripts/serveurs qui pilotent l'API TOTP.",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "secret": "totp-api-admin-secret",
+      "clientAuthenticatorType": "client-secret",
+      "standardFlowEnabled": false,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": true,
+      "fullScopeAllowed": true,
+      "redirectUris": [],
+      "webOrigins": [],
+      "attributes": {
+        "access.token.lifespan": "1800"
+      }
+    },
+    {
+      "clientId": "totp-test-cli",
+      "name": "TOTP test CLI (password grant)",
+      "description": "Client public pour tester l'authentification d'un utilisateur final.",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": true,
+      "redirectUris": ["http://localhost:*"],
+      "webOrigins": ["*"]
+    }
+  ],
+  "users": [
+    {
+      "id": "11111111-1111-1111-1111-111111111111",
+      "username": "alice",
+      "enabled": true,
+      "emailVerified": true,
+      "firstName": "Alice",
+      "lastName": "Tester",
+      "email": "alice@example.com",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "alice",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["default-roles-totp-test"]
+    },
+    {
+      "username": "service-account-totp-api-admin",
+      "enabled": true,
+      "serviceAccountClientId": "totp-api-admin",
+      "realmRoles": ["default-roles-totp-test", "manage-totp"]
+    }
+  ]
+}

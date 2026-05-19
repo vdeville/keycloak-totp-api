@@ -33,7 +33,9 @@ set APP_HOME=%DIRNAME%
 for %%i in ("%APP_HOME%") do set APP_HOME=%%~fi
 
 @rem Add default JVM options here. You can also use JAVA_OPTS and GRADLE_OPTS to pass JVM options to this script.
-set DEFAULT_JVM_OPTS="-Xmx64m" "-Xms64m"
+@rem --enable-native-access=ALL-UNNAMED silences the JEP 472 warning emitted
+@rem by native-platform under JDK 24+ (remove once Gradle modularises its internals).
+set DEFAULT_JVM_OPTS="-Xmx64m" "-Xms64m" "--enable-native-access=ALL-UNNAMED"
 
 @rem Find java.exe
 if defined JAVA_HOME goto findJavaFromJavaHome

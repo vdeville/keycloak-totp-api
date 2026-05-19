@@ -1,15 +1,12 @@
 package id.medihause.keycloak.totp.api
 
-import id.medihause.keycloak.totp.api.api.TOTPResourceApi
+import id.medihause.keycloak.totp.api.resource.TOTPResourceApi
 import org.keycloak.models.KeycloakSession
 import org.keycloak.services.resource.RealmResourceProvider
 
-class TOTPApiRealmResourceProvider(
-    private val session: KeycloakSession
-): RealmResourceProvider {
-    override fun close() {}
+class TOTPApiRealmResourceProvider(session: KeycloakSession) : RealmResourceProvider {
+    private val resource = TOTPResourceApi(session)
 
-    override fun getResource(): TOTPResourceApi {
-        return TOTPResourceApi(session)
-    }
+    override fun close() {}
+    override fun getResource(): TOTPResourceApi = resource
 }

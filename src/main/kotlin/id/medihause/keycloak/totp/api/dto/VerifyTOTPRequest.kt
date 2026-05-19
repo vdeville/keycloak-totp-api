@@ -12,8 +12,17 @@ data class VerifyTOTPRequest(
     val code: String
 ) {
     companion object {
-        fun validate(request: VerifyTOTPRequest): Boolean {
-            return request.deviceName.isNotEmpty() && request.code.isNotEmpty()
+        const val MAX_DEVICE_NAME_LENGTH = 128
+        private val DEVICE_NAME_REGEX = Regex("^[\\w.\\- ]{1,$MAX_DEVICE_NAME_LENGTH}$")
+
+        fun validate(request: VerifyTOTPRequest, expectedDigits: Int): String? {
+            if (!DEVICE_NAME_REGEX.matches(request.deviceName)) {
+                return "Invalid deviceName"
+            }
+            if (request.code.length != expectedDigits || !request.code.all(Char::isDigit)) {
+                return "Invalid code format"
+            }
+            return null
         }
     }
 }
