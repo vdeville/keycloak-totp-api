@@ -31,6 +31,7 @@ body:json {
 docs {
   Pour générer `initialCode` :
   - flashez le QR code retourné par `02 - Generate TOTP` dans une app Authenticator
+  - OU collez `encoded_secret` dans https://totp.danhersam.com/ (test rapide sans installer d'app)
   - OU calculez le TOTP localement à partir de `encoded_secret` (Base32) avec un outil type `oathtool` :
       oathtool --totp -b "$ENCODED_SECRET"
   Le secret n'est valide que 5 minutes après l'appel à `/generate`.

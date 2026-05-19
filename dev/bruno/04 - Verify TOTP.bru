@@ -27,7 +27,8 @@ body:json {
 }
 
 docs {
-  Lance la même app Authenticator que `03 - Register TOTP` pour obtenir le code courant.
+  Récupère le code courant depuis la même source que `03 - Register TOTP` :
+  app Authenticator, https://totp.danhersam.com/, ou `oathtool --totp -b "$ENCODED_SECRET"`.
 }
 
 tests {
